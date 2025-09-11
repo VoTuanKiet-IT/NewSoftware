@@ -1,17 +1,27 @@
+LoadData();
 //GET: domain:port//posts
 //GET: domain:port/posts/id
 async function LoadData() {
-    try {
-        let data = await fetch('http://localhost:3000/posts');
-        let posts = await data.json();
+    let data = await fetch('http://localhost:3000/posts');
+    let posts = await data.json();
+    for (const post of posts) {
         let body = document.getElementById("body");
-        body.innerHTML = ''; 
-        for (const post of posts) {
-            body.innerHTML += convertDataToHTML(post);
-        }
-    } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
+        body.innerHTML += convertDataToHTML(post);
     }
+}
+function LoadDataA() {
+    fetch('http://localhost:3000/posts').then(
+        function (data) {
+            return data.json()
+        }
+    ).then(
+        function (posts) {
+            for (const post of posts) {
+                let body = document.getElementById("body");
+                body.innerHTML += convertDataToHTML(post);
+            }
+        }
+    )
 }
 
 function convertDataToHTML(post) {
@@ -19,16 +29,18 @@ function convertDataToHTML(post) {
     result += "<td>" + post.id + "</td>";
     result += "<td>" + post.title + "</td>";
     result += "<td>" + post.views + "</td>";
-    result += "<td><input type='submit' value='Delete' onclick='Delete(" + post.id + ")'></input></td>";
+    result += "<td><input type='submit' value='Delete' onclick='Delete("+post.id+")'></input></td>";
     result += "</tr>";
     return result;
 }
 
-async function SaveData() {
+
+
+//POST: domain:port//posts + body
+async function SaveData(){
     let id = document.getElementById("id").value;
     let title = document.getElementById("title").value;
     let view = document.getElementById("view").value;
-
     try {
         let checkData = await fetch("http://localhost:3000/posts/" + id);
 
@@ -37,7 +49,7 @@ async function SaveData() {
             views: view
         };
 
-        if (checkData.ok) {
+        if (checkData.ok) { 
             let response = await fetch('http://localhost:3000/posts/' + id, {
                 method: 'PUT',
                 body: JSON.stringify(dataObj),
@@ -66,10 +78,11 @@ async function SaveData() {
 
     } catch (error) {
         console.error("Lỗi khi lưu dữ liệu:", error);
-    }
+    }   
 }
 
-async function Delete(id) {
+//DELETE: domain:port//posts/id
+async function Delete(id){
     try {
         let response = await fetch('http://localhost:3000/posts/' + id, {
             method: 'DELETE'
