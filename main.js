@@ -1,13 +1,27 @@
+//Name: Võ Tuấn Kiệt
+//MSSV: 1911060146
+
+
+let currentMaxId = 0;
 LoadData();
 //GET: domain:port//posts
 //GET: domain:port/posts/id
 async function LoadData() {
+    
     let data = await fetch('http://localhost:3000/posts');
     let posts = await data.json();
-    for (const post of posts) {
-        let body = document.getElementById("body");
-        body.innerHTML += convertDataToHTML(post);
-    }
+    let body = document.getElementById("body");
+        body.innerHTML = '';
+        const activePosts = posts.filter(post => !post.isDeleted);
+
+        if (posts.length > 0) {
+            currentMaxId = Math.max(...posts.map(post => post.id));
+        } else {
+            currentMaxId = 0;
+        }
+        for (const post of posts) {
+            body.innerHTML += convertDataToHTML(post);
+        }
 }
 function LoadDataA() {
     fetch('http://localhost:3000/posts').then(
@@ -16,8 +30,7 @@ function LoadDataA() {
         }
     ).then(
         function (posts) {
-            for (const post of posts) {
-                let body = document.getElementById("body");
+            for (const post of activePosts) { 
                 body.innerHTML += convertDataToHTML(post);
             }
         }
@@ -35,60 +48,52 @@ function convertDataToHTML(post) {
 }
 
 
-
 //POST: domain:port//posts + body
 async function SaveData(){
-    let id = document.getElementById("id").value;
     let title = document.getElementById("title").value;
     let view = document.getElementById("view").value;
-    try {
-        let checkData = await fetch("http://localhost:3000/posts/" + id);
 
-        let dataObj = {
+    try {
+        currentMaxId++; 
+        let newPostData = {
+            id: currentMaxId,
             title: title,
-            views: view
+            views: view,
+            isDeleted: false
         };
 
-        if (checkData.ok) { 
-            let response = await fetch('http://localhost:3000/posts/' + id, {
-                method: 'PUT',
-                body: JSON.stringify(dataObj),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            console.log("Cập nhật thành công:", response);
-        } else { 
-            let newPostData = {
-                id: id,
-                title: title,
-                views: view
-            };
-            let response = await fetch('http://localhost:3000/posts', {
-                method: 'POST',
-                body: JSON.stringify(newPostData),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            console.log("Tạo mới thành công:", response);
+        let response = await fetch('http://localhost:3000/posts', {
+            method: 'POST',
+            body: JSON.stringify(newPostData),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        
+        if (response.ok) {
+            console.log("Thêm mới thành công!");
+            LoadData(); 
+        } else {
+            console.error("Lỗi khi thêm mới:", response.statusText);
         }
-
-        LoadData();
 
     } catch (error) {
         console.error("Lỗi khi lưu dữ liệu:", error);
-    }   
+    }
 }
 
 //DELETE: domain:port//posts/id
 async function Delete(id){
     try {
         let response = await fetch('http://localhost:3000/posts/' + id, {
-            method: 'DELETE'
+            method: 'PATCH', 
+            body: JSON.stringify({ isDeleted: true }),
+            headers: {
+                "Content-Type": "application/json"
+            }
         });
         if (response.ok) {
-            console.log("Xóa thành công");
+            console.log("Xóa mềm thành công");
             LoadData();
         } else {
             console.error("Lỗi khi xóa:", response.statusText);

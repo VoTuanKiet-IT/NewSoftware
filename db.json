@@ -8,12 +8,30 @@
     {
       "id": "4",
       "title": "haha",
-      "views": "200000"
+      "views": "200000",
+      "isDeleted": true
     },
     {
       "id": "1",
       "title": "Vo Tuan Kiet",
-      "views": "5000"
+      "views": "5000",
+      "isDeleted": true
+    },
+    {
+      "id": 5,
+      "title": "hehe",
+      "views": "200000"
+    },
+    {
+      "id": 6,
+      "title": "hyhy",
+      "views": "562"
+    },
+    {
+      "id": 7,
+      "title": "kaka",
+      "views": "2323",
+      "isDeleted": false
     }
   ],
   "comments": [
