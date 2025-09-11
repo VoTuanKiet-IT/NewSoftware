@@ -2,16 +2,17 @@
 //MSSV: 1911060146
 
 
-let currentMaxId = 0;
+let currentMaxId = "0";
 LoadData();
 //GET: domain:port//posts
 //GET: domain:port/posts/id
 async function LoadData() {
-    
-    let data = await fetch('http://localhost:3000/posts');
-    let posts = await data.json();
-    let body = document.getElementById("body");
+    try {
+        let data = await fetch('http://localhost:3000/posts');
+        let posts = await data.json();
+        let body = document.getElementById("body");
         body.innerHTML = '';
+
         const activePosts = posts.filter(post => !post.isDeleted);
 
         if (posts.length > 0) {
@@ -19,9 +20,12 @@ async function LoadData() {
         } else {
             currentMaxId = 0;
         }
-        for (const post of posts) {
+        for (const post of activePosts) { 
             body.innerHTML += convertDataToHTML(post);
         }
+    } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+    }
 }
 function LoadDataA() {
     fetch('http://localhost:3000/posts').then(
@@ -30,7 +34,9 @@ function LoadDataA() {
         }
     ).then(
         function (posts) {
+            const activePosts = posts.filter(post => !post.isDeleted);
             for (const post of activePosts) { 
+                let body = document.getElementById("body");
                 body.innerHTML += convertDataToHTML(post);
             }
         }
